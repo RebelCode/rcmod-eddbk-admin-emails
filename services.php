@@ -13,7 +13,7 @@ return [
      * @since [*next-version*]
      */
     'eddbk_email_tags_register_handler'        => function (ContainerInterface $c) {
-        return new EmailTagRegisterHandler($c->get('eddbk_admin_emails/email_tags'), $c);
+        return new EmailTagRegisterHandler($c->get('eddbk_admin_emails/edd_email_tags'), $c);
     },
 
     /*
