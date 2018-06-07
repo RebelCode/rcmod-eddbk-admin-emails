@@ -7,12 +7,10 @@ use Dhii\Data\Container\ContainerFactoryInterface;
 use Dhii\Event\EventFactoryInterface;
 use Dhii\Exception\InternalException;
 use Dhii\I18n\StringTranslatingTrait;
-use Dhii\I18n\StringTranslatorAwareTrait;
-use Dhii\I18n\StringTranslatorConsumingTrait;
+use Dhii\Util\String\StringableInterface as Stringable;
 use Psr\Container\ContainerInterface;
 use Psr\EventManager\EventManagerInterface;
 use RebelCode\Modular\Module\AbstractBaseModule;
-use Dhii\Util\String\StringableInterface as Stringable;
 
 /**
  * The module class.
@@ -23,12 +21,6 @@ class EddBkAdminEmailsModule extends AbstractBaseModule
 {
     /* @since [*next-version*] */
     use StringTranslatingTrait;
-
-    /* @since [*next-version*] */
-    use StringTranslatorConsumingTrait;
-
-    /* @since [*next-version*] */
-    use StringTranslatorAwareTrait;
 
     /**
      * Constructor.
