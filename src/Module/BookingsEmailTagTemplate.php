@@ -89,15 +89,6 @@ class BookingsEmailTagTemplate implements TemplateInterface
     use StringTranslatingTrait;
 
     /**
-     * The placeholder template.
-     *
-     * @since [*next-version*]
-     *
-     * @var TemplateInterface
-     */
-    protected $placeholderTemplate;
-
-    /**
      * The services SELECT resource model.
      *
      * @since [*next-version*]
@@ -181,7 +172,7 @@ class BookingsEmailTagTemplate implements TemplateInterface
             $bookingRows .= $this->_renderBookingRow($_booking);
         }
 
-        return $this->placeholderTemplate->render([
+        return $this->_getTemplate()->render([
             'columns'      => $columns,
             'booking_rows' => $bookingRows,
         ]);
