@@ -243,7 +243,7 @@ class BookingsEmailTagTemplate implements TemplateInterface
         }
 
         return sprintf(
-            '<tr><td>%1$s</td><td>%2$s</td><td>%3$s</td></tr>',
+            '<tr><td>%1$s</td><td>%2$s</td></tr>',
             $serviceName,
             $start->format($this->bookingDateTimeFormat)
         );
