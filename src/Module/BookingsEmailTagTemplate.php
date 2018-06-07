@@ -3,6 +3,8 @@
 namespace RebelCode\EddBookings\Emails\Module;
 
 use ArrayAccess;
+use DateTime;
+use DateTimeZone;
 use Dhii\Data\Container\ContainerGetCapableTrait;
 use Dhii\Data\Container\CreateContainerExceptionCapableTrait;
 use Dhii\Data\Container\CreateNotFoundExceptionCapableTrait;
@@ -22,11 +24,12 @@ use Dhii\Storage\Resource\SelectCapableInterface;
 use Dhii\Util\Normalization\NormalizeIntCapableTrait;
 use Dhii\Util\Normalization\NormalizeIterableCapableTrait;
 use Dhii\Util\Normalization\NormalizeStringCapableTrait;
+use Dhii\Util\String\StringableInterface as Stringable;
+use Exception;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RebelCode\Bookings\BookingInterface;
-use Dhii\Util\String\StringableInterface as Stringable;
 
 /**
  * The template for the bookings email tag.
@@ -226,10 +229,23 @@ class BookingsEmailTagTemplate implements TemplateInterface
             );
         }
 
+        $start = new DateTime($booking->getStart(), 'UTC');
+
+        try {
+            $clientTz = $this->_containerGet($booking, 'client_tz');
+            if (!empty($clientTz)) {
+                $start->setTimezone(new DateTimeZone($clientTz));
+            }
+        } catch (NotFoundExceptionInterface $nfException) {
+            // booking has no client timezone
+        } catch (Exception $exception) {
+            // failed to parse timezone name
+        }
+
         return sprintf(
             '<tr><td>%1$s</td><td>%2$s</td><td>%3$s</td></tr>',
             $serviceName,
-            date($this->bookingDateTimeFormat, $booking->getStart()),
+            $start->format($this->bookingDateTimeFormat)
         );
     }
 }
