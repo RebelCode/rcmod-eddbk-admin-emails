@@ -229,7 +229,7 @@ class BookingsEmailTagTemplate implements TemplateInterface
             );
         }
 
-        $start = new DateTime($booking->getStart(), 'UTC');
+        $start = new DateTime($booking->getStart(), new DateTimeZone('UTC'));
 
         try {
             $clientTz = $this->_containerGet($booking, 'client_tz');
