@@ -124,7 +124,7 @@ class EmailTagRegisterHandler implements InvocableInterface
             \edd_add_email_tag(
                 $this->_containerGet($_tag, 'tag'),
                 $this->_translate($this->_containerGet($_tag, 'description')),
-                $this->_containerGet($_tag, 'handler')
+                $this->_getContainer()->get($this->_containerGet($_tag, 'handler'))
             );
         }
     }
