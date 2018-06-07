@@ -81,5 +81,7 @@ class EddBkAdminEmailsModule extends AbstractBaseModule
         if ($c === null) {
             return;
         }
+
+        $this->_attach('edd_add_email_tags', $c->get('eddbk_email_tag_register_handler'));
     }
 }
