@@ -161,10 +161,9 @@ class BookingsEmailTagTemplate implements TemplateInterface
             );
         }
 
-        $columns = sprintf('<th>%1$s</th><th>%2$s</th><th>%3$s</th>',
+        $columns = sprintf('<th>%1$s</th><th>%2$s</th>',
             $this->__('Service'),
-            $this->__('Start'),
-            $this->__('End')
+            $this->__('When')
         );
 
         $bookingRows = '';
@@ -231,7 +230,6 @@ class BookingsEmailTagTemplate implements TemplateInterface
             '<tr><td>%1$s</td><td>%2$s</td><td>%3$s</td></tr>',
             $serviceName,
             date($this->bookingDateTimeFormat, $booking->getStart()),
-            date($this->bookingDateTimeFormat, $booking->getEnd())
         );
     }
 }
