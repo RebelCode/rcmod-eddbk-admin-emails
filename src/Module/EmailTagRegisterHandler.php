@@ -123,7 +123,7 @@ class EmailTagRegisterHandler implements InvocableInterface
         foreach ($this->_getTagsConfig() as $_tag) {
             \edd_add_email_tag(
                 $this->_containerGet($_tag, 'tag'),
-                $this->_translate($this->_containerGet($_tag, 'description')),
+                $this->__($this->_containerGet($_tag, 'description')),
                 $this->_getContainer()->get($this->_containerGet($_tag, 'handler'))
             );
         }
