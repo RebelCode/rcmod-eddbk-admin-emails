@@ -70,7 +70,6 @@
       <path value="$PROJECT_DIR$/vendor/friendsofphp/php-cs-fixer" />
       <path value="$PROJECT_DIR$/vendor/johnpbloch/wordpress-core" />
       <path value="$PROJECT_DIR$/vendor/dhii/output-renderer-abstract" />
-      <path value="$PROJECT_DIR$/vendor/dhii/cqrs-resource-model-interface" />
       <path value="$PROJECT_DIR$/vendor/dhii/normalization-helper-base" />
       <path value="$PROJECT_DIR$/vendor/dhii/output-renderer-interface" />
       <path value="$PROJECT_DIR$/vendor/dhii/output-renderer-base" />
@@ -79,6 +78,7 @@
       <path value="$PROJECT_DIR$/vendor/dhii/stringable-helper-base" />
       <path value="$PROJECT_DIR$/vendor/dhii/regex-abstract" />
       <path value="$PROJECT_DIR$/vendor/symfony/stopwatch" />
+      <path value="$PROJECT_DIR$/vendor/dhii/cqrs-resource-model-interface" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="5.4.0" />
