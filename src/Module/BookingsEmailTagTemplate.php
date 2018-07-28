@@ -29,7 +29,7 @@ use Exception;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use RebelCode\Bookings\BookingInterface;
+use stdClass;
 
 /**
  * The template for the bookings email tag.
@@ -185,20 +185,12 @@ class BookingsEmailTagTemplate implements TemplateInterface
      *
      * @since [*next-version*]
      *
-     * @param BookingInterface|ContainerInterface|ArrayAccess $booking The booking. Must be a booking instance and also
-     *                                                                 a valid readable container.
+     * @param array|stdClass|ArrayAccess|ContainerInterface $booking The booking data container.
      *
      * @return string|Stringable The rendered row.
      */
     protected function _renderBookingRow($booking)
     {
-        if (!($booking instanceof BookingInterface)) {
-            throw $this->_createInvalidArgumentException(
-                $this->__('Argument is not a booking instance'), null, null, $booking
-            );
-        }
-
-        /* @var $booking BookingInterface|ContainerInterface|ArrayAccess */
         $booking = $this->_normalizeContainer($booking);
 
         // Alias expression builder
@@ -229,7 +221,8 @@ class BookingsEmailTagTemplate implements TemplateInterface
             );
         }
 
-        $start = new DateTime('@' . $booking->getStart(), new DateTimeZone('UTC'));
+        $start = $this->_containerGet($booking, 'start');
+        $start = new DateTime('@' . $start, new DateTimeZone('UTC'));
 
         try {
             $clientTz = $this->_containerGet($booking, 'client_tz');
