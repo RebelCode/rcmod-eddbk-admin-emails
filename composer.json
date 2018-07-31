@@ -14,10 +14,9 @@
     "require": {
         "php": "^5.4 | ^7.0",
         "rebelcode/modular": "^0.1-alpha1",
-        "rebelcode/booking": "^0.1-alpha1",
         "dhii/output-renderer-base": "^0.1-alpha1",
         "dhii/placeholder-template": "^0.1-alpha1",
-        "dhii/cqrs-resource-model-interface": "^0.1-alpha1"
+        "dhii/cqrs-resource-model-interface": "^0.1-alpha1 | ^0.2-alpha1"
     },
     "require-dev": {
         "phpunit/phpunit": "^4.8",
