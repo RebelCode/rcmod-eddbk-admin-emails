@@ -37,8 +37,7 @@ return [
     'eddbk_email_bookings_tag_template'        => function (ContainerInterface $c) {
         return new BookingsEmailTagTemplate(
             $c->get('eddbk_email_bookings_tag_layout_template'),
-            $c->get('eddbk_services_select_rm'),
-            $c->get('sql_expression_builder'),
+            $c->get('eddbk_services_manager'),
             $c->get('eddbk_admin_emails/templates/bookings_table/booking_datetime_format')
         );
     },
