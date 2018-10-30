@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [[*next-version*]] - YYYY-MM-DD
+
+## [0.1-alpha3] - 2018-10-30
 ### Changed
 - Now using a services manager instead of the SELECT CQRS resource model.
 - The module now depends on the EDD Bookings services module.
