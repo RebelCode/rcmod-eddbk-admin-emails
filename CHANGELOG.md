@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [[*next-version*]] - YYYY-MM-DD
 ### Changed
 - Now using a services manager instead of the SELECT CQRS resource model.
+- The module now depends on the EDD Bookings services module.
 
 ## [0.1-alpha2] - 2018-07-31
 ### Changed
