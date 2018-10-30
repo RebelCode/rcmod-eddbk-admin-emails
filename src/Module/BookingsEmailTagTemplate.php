@@ -20,7 +20,6 @@ use Dhii\Output\CreateRendererExceptionCapableTrait;
 use Dhii\Output\CreateTemplateRenderExceptionCapableTrait;
 use Dhii\Output\TemplateAwareTrait;
 use Dhii\Output\TemplateInterface;
-use Dhii\Storage\Resource\SelectCapableInterface;
 use Dhii\Util\Normalization\NormalizeIntCapableTrait;
 use Dhii\Util\Normalization\NormalizeIterableCapableTrait;
 use Dhii\Util\Normalization\NormalizeStringCapableTrait;
@@ -29,6 +28,7 @@ use Exception;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use RebelCode\Entity\GetCapableManagerInterface;
 use stdClass;
 
 /**
@@ -92,22 +92,13 @@ class BookingsEmailTagTemplate implements TemplateInterface
     use StringTranslatingTrait;
 
     /**
-     * The services SELECT resource model.
+     * The services manger for retrieving services by ID.
      *
      * @since [*next-version*]
      *
-     * @var SelectCapableInterface
+     * @var GetCapableManagerInterface
      */
-    protected $servicesSelectRm;
-
-    /**
-     * The expression builder.
-     *
-     * @since [*next-version*]
-     *
-     * @var object
-     */
-    protected $exprBuilder;
+    protected $servicesManager;
 
     /**
      * The format to use to render booking dates and times.
@@ -123,21 +114,18 @@ class BookingsEmailTagTemplate implements TemplateInterface
      *
      * @since [*next-version*]
      *
-     * @param TemplateInterface      $layoutTemplate        The layout template.
-     * @param SelectCapableInterface $servicesSelectRm      The services SELECT resource model.
-     * @param object                 $exprBuilder           The expression builder.
-     * @param Stringable|string      $bookingDateTimeFormat The booking date and time format.
+     * @param TemplateInterface          $layoutTemplate        The layout template.
+     * @param GetCapableManagerInterface $servicesManager       The services manager for retrieving services by ID.
+     * @param Stringable|string          $bookingDateTimeFormat The booking date and time format.
      */
     public function __construct(
         TemplateInterface $layoutTemplate,
-        SelectCapableInterface $servicesSelectRm,
-        $exprBuilder,
+        GetCapableManagerInterface $servicesManager,
         $bookingDateTimeFormat
     ) {
         $this->_setTemplate($layoutTemplate);
 
-        $this->servicesSelectRm      = $servicesSelectRm;
-        $this->exprBuilder           = $exprBuilder;
+        $this->servicesManager       = $servicesManager;
         $this->bookingDateTimeFormat = $bookingDateTimeFormat;
     }
 
@@ -191,35 +179,19 @@ class BookingsEmailTagTemplate implements TemplateInterface
      */
     protected function _renderBookingRow($booking)
     {
-        $booking = $this->_normalizeContainer($booking);
-
-        // Alias expression builder
-        $b = $this->exprBuilder;
-
-        // Get services that match the ID
+        $booking   = $this->_normalizeContainer($booking);
         $serviceId = $this->_containerGet($booking, 'service_id');
-        $services  = $this->servicesSelectRm->select($b->and(
-            $b->eq(
-                $b->ef('service', 'id'), $b->lit($serviceId)
-            )
-        ));
-        // Fail if no services or more than 1 service matched
-        if (($c = $this->_countIterable($services)) !== 1) {
-            throw $this->_createRuntimeException(
-                $this->__('Booking\'s service ID "%1$s" matched %2$d services', [$serviceId, $c])
-            );
-        }
-        // Get the service
-        $service = reset($services);
 
         try {
-            // Get the service name
-            $serviceName = $this->_containerGet($service, 'name');
+            // Get the service
+            $service = $this->servicesManager->get($serviceId);
         } catch (NotFoundExceptionInterface $exception) {
             throw $this->_createRuntimeException(
-                $this->__('Failed to retrieve the service name'), null, null
+                $this->__('Failed to retrieve the service for the booking'), null, null
             );
         }
+
+        $serviceName = $this->_containerGet($service, 'name');
 
         $start = $this->_containerGet($booking, 'start');
         $start = new DateTime('@' . $start, new DateTimeZone('UTC'));

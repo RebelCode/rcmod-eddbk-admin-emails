@@ -17,7 +17,7 @@ define('RCMOD_EDDBK_ADMIN_EMAILS_SERVICES_FILE', RCMOD_EDDBK_ADMIN_EMAILS_SERVIC
 return function (ContainerInterface $c) {
     return new EddBkAdminEmailsModule(
         RCMOD_EDDBK_ADMIN_EMAILS_MODULE_KEY,
-        [],
+        ['eddbk_services'],
         $c->get('config_factory'),
         $c->get('container_factory'),
         $c->get('composite_container_factory'),
