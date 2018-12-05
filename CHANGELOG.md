@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [[*next-version*]] - YYYY-MM-DD
+### Added
+- EDD email `bookings` tag shows booking resources and session label, if applicable.
+
+### Changed
+- Purchase receipt email shows a list instead of a table.
+- Changed booking date time format to include full day-of-the-week name.
 
 ## [0.1-alpha3] - 2018-10-30
 ### Changed
