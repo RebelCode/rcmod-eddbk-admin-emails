@@ -10,11 +10,11 @@ return [
             ],
         ],
         'templates'      => [
-            'bookings_table'      => [
-                'booking_datetime_format' => 'D, jS M Y, H:i',
+            'receipt'      => [
+                'booking_datetime_format' => 'l jS M Y, H:i',
             ],
-            'bookings_table_layout' => [
-                'file'          => 'bookings-table-layout.html',
+            'receipt_layout' => [
+                'file'          => 'email-receipt.html',
                 'token_start'   => '${',
                 'token_end'     => '}',
                 'token_default' => '',

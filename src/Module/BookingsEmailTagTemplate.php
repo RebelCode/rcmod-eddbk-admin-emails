@@ -2,14 +2,16 @@
 
 namespace RebelCode\EddBookings\Emails\Module;
 
-use ArrayAccess;
-use DateTime;
+use Carbon\Carbon;
+use Carbon\CarbonInterval;
 use DateTimeZone;
+use Dhii\Cache\ContainerInterface as CacheContainerInterface;
 use Dhii\Data\Container\ContainerGetCapableTrait;
 use Dhii\Data\Container\CreateContainerExceptionCapableTrait;
 use Dhii\Data\Container\CreateNotFoundExceptionCapableTrait;
 use Dhii\Data\Container\NormalizeContainerCapableTrait;
 use Dhii\Data\Container\NormalizeKeyCapableTrait;
+use Dhii\Data\StateAwareInterface;
 use Dhii\Exception\CreateInvalidArgumentExceptionCapableTrait;
 use Dhii\Exception\CreateOutOfRangeExceptionCapableTrait;
 use Dhii\Exception\CreateRuntimeExceptionCapableTrait;
@@ -20,21 +22,24 @@ use Dhii\Output\CreateRendererExceptionCapableTrait;
 use Dhii\Output\CreateTemplateRenderExceptionCapableTrait;
 use Dhii\Output\TemplateAwareTrait;
 use Dhii\Output\TemplateInterface;
+use Dhii\Util\Normalization\NormalizeArrayCapableTrait;
 use Dhii\Util\Normalization\NormalizeIntCapableTrait;
 use Dhii\Util\Normalization\NormalizeIterableCapableTrait;
 use Dhii\Util\Normalization\NormalizeStringCapableTrait;
 use Dhii\Util\String\StringableInterface as Stringable;
 use Exception;
 use InvalidArgumentException;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use RebelCode\Bookings\BookingFactoryInterface;
+use RebelCode\Bookings\BookingInterface;
+use RebelCode\EddBookings\Cart\Module\GetBookingSessionInfoCapableTrait;
+use RebelCode\EddBookings\Cart\Module\GetBookingSessionTypeCapableTrait;
 use RebelCode\Entity\GetCapableManagerInterface;
-use stdClass;
 
 /**
  * The template for the bookings email tag.
  *
- * This implementation uses another template for the table layout, passing it the pre-rendered columns and rows.
+ * This implementation uses another template for the bookings receipt list.
  *
  * @since [*next-version*]
  */
@@ -42,6 +47,12 @@ class BookingsEmailTagTemplate implements TemplateInterface
 {
     /* @since [*next-version*] */
     use TemplateAwareTrait;
+
+    /* @since [*next-version*] */
+    use GetBookingSessionTypeCapableTrait;
+
+    /* @since [*next-version*] */
+    use GetBookingSessionInfoCapableTrait;
 
     /* @since [*next-version*] */
     use ContainerGetCapableTrait;
@@ -63,6 +74,9 @@ class BookingsEmailTagTemplate implements TemplateInterface
 
     /* @since [*next-version*] */
     use NormalizeIterableCapableTrait;
+
+    /* @since [*next-version*] */
+    use NormalizeArrayCapableTrait;
 
     /* @since [*next-version*] */
     use NormalizeContainerCapableTrait;
@@ -92,13 +106,49 @@ class BookingsEmailTagTemplate implements TemplateInterface
     use StringTranslatingTrait;
 
     /**
-     * The services manger for retrieving services by ID.
+     * The factory for creating booking instances.
+     *
+     * @since [*next-version*]
+     *
+     * @var BookingFactoryInterface
+     */
+    protected $bookingFactory;
+
+    /**
+     * The services manager for retrieving services by ID.
      *
      * @since [*next-version*]
      *
      * @var GetCapableManagerInterface
      */
     protected $servicesManager;
+
+    /**
+     * The resources manager for retrieving resources by ID.
+     *
+     * @since [*next-version*]
+     *
+     * @var GetCapableManagerInterface
+     */
+    protected $resourcesManager;
+
+    /**
+     * The services cache.
+     *
+     * @since [*next-version*]
+     *
+     * @var CacheContainerInterface
+     */
+    protected $servicesCache;
+
+    /**
+     * The resources cache.
+     *
+     * @since [*next-version*]
+     *
+     * @var CacheContainerInterface
+     */
+    protected $resourcesCache;
 
     /**
      * The format to use to render booking dates and times.
@@ -115,17 +165,29 @@ class BookingsEmailTagTemplate implements TemplateInterface
      * @since [*next-version*]
      *
      * @param TemplateInterface          $layoutTemplate        The layout template.
+     * @param BookingFactoryInterface    $bookingFactory        The bookings factory.
      * @param GetCapableManagerInterface $servicesManager       The services manager for retrieving services by ID.
+     * @param GetCapableManagerInterface $resourcesManager      The resources manager for retrieving resources by ID.
+     * @param CacheContainerInterface    $serviceCache          The cache for service.
+     * @param CacheContainerInterface    $resourceCache         The cache for resource.
      * @param Stringable|string          $bookingDateTimeFormat The booking date and time format.
      */
     public function __construct(
         TemplateInterface $layoutTemplate,
+        BookingFactoryInterface $bookingFactory,
         GetCapableManagerInterface $servicesManager,
+        GetCapableManagerInterface $resourcesManager,
+        CacheContainerInterface $serviceCache,
+        CacheContainerInterface $resourceCache,
         $bookingDateTimeFormat
     ) {
         $this->_setTemplate($layoutTemplate);
 
+        $this->bookingFactory        = $bookingFactory;
         $this->servicesManager       = $servicesManager;
+        $this->resourcesManager      = $resourcesManager;
+        $this->servicesCache         = $serviceCache;
+        $this->resourcesCache        = $resourceCache;
         $this->bookingDateTimeFormat = $bookingDateTimeFormat;
     }
 
@@ -152,35 +214,61 @@ class BookingsEmailTagTemplate implements TemplateInterface
             );
         }
 
-        $columns = sprintf('<th>%1$s</th><th>%2$s</th>',
-            $this->__('Service'),
-            $this->__('When')
-        );
+        $bookingsList = '';
+        foreach ($bookings as $_bookingData) {
+            $_booking = $this->bookingFactory->make([
+                BookingFactoryInterface::K_DATA => $_bookingData,
+            ]);
 
-        $bookingRows = '';
-        foreach ($bookings as $_booking) {
-            $bookingRows .= $this->_renderBookingRow($_booking);
+            $bookingsList .= $this->_renderBooking($_booking);
         }
 
         return $this->_getTemplate()->render([
-            'columns'      => $columns,
-            'booking_rows' => $bookingRows,
+            'bookings' => $bookingsList,
         ]);
     }
 
     /**
-     * Renders a single booking info row.
+     * Renders a single booking.
      *
      * @since [*next-version*]
      *
-     * @param array|stdClass|ArrayAccess|ContainerInterface $booking The booking data container.
+     * @param BookingInterface|StateAwareInterface $booking The booking. Must also be state aware.
      *
-     * @return string|Stringable The rendered row.
+     * @return string|Stringable The rendered result.
      */
-    protected function _renderBookingRow($booking)
+    protected function _renderBooking($booking)
     {
-        $booking   = $this->_normalizeContainer($booking);
-        $serviceId = $this->_containerGet($booking, 'service_id');
+        $serviceId = $booking->getState()->get('service_id');
+
+        // Create date time helper instance for the booking start time
+        $startTs = $booking->getStart();
+        $startDt = Carbon::createFromTimestampUTC($startTs);
+
+        // Shift to client timezone, if available
+        try {
+            $clientTz = $booking->getState()->get('client_tz');
+            if (!empty($clientTz)) {
+                $startDt->setTimezone(new DateTimeZone($clientTz));
+            }
+        } catch (NotFoundExceptionInterface $nfException) {
+            // booking has no client timezone
+        } catch (Exception $exception) {
+            // failed to parse timezone name
+        }
+
+        // Get the matching session's info
+        $sessionInfo = $this->_getBookingSessionInfo($booking);
+        // Append the session label to the service name if it exists
+        $sessionLabel = $this->_containerGet($sessionInfo, 'session_label');
+        if (empty($sessionLabel)) {
+            $sessionLabel = CarbonInterval::seconds($booking->getDuration())->cascade()->forHumans();
+        }
+        // Prepare the resources text
+        $resources     = $this->_containerGet($sessionInfo, 'resource_names');
+        $resourcesText = !empty($resources)
+            ? sprintf('%s %s', $this->__('with'), implode(', ', $resources))
+            : '';
 
         try {
             // Get the service
@@ -193,24 +281,49 @@ class BookingsEmailTagTemplate implements TemplateInterface
 
         $serviceName = $this->_containerGet($service, 'name');
 
-        $start = $this->_containerGet($booking, 'start');
-        $start = new DateTime('@' . $start, new DateTimeZone('UTC'));
+        $session = sprintf('<b>%s (%s)</b> %s', $serviceName, $sessionLabel, $resourcesText);
+        $dateStr = $startDt->format($this->bookingDateTimeFormat);
 
-        try {
-            $clientTz = $this->_containerGet($booking, 'client_tz');
-            if (!empty($clientTz)) {
-                $start->setTimezone(new DateTimeZone($clientTz));
-            }
-        } catch (NotFoundExceptionInterface $nfException) {
-            // booking has no client timezone
-        } catch (Exception $exception) {
-            // failed to parse timezone name
-        }
+        return sprintf('<li>%s - <i>%s</i></li>', $session, $dateStr);
+    }
 
-        return sprintf(
-            '<tr><td>%1$s</td><td>%2$s</td></tr>',
-            $serviceName,
-            $start->format($this->bookingDateTimeFormat)
-        );
+    /**
+     * {@inheritdoc}
+     *
+     * @since [*next-version*]
+     */
+    protected function _getResourcesManager()
+    {
+        return $this->resourcesManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @since [*next-version*]
+     */
+    protected function _getResourceCache()
+    {
+        return $this->resourcesCache;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @since [*next-version*]
+     */
+    protected function _getServicesManager()
+    {
+        return $this->servicesManager;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @since [*next-version*]
+     */
+    protected function _getServiceCache()
+    {
+        return $this->servicesCache;
     }
 }
