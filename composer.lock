@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "d65918cec484ac5981ae448f799521be",
+    "content-hash": "ed566a8c06fc1a05d89ed02a9b76925a",
     "packages": [
         {
             "name": "dhii/args-list-validation",
@@ -2056,16 +2056,16 @@
         },
         {
             "name": "rebelcode/booking-system-interface",
-            "version": "dev-develop",
+            "version": "v0.1-alpha1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RebelCode/booking-system-interface.git",
-                "reference": "475bb56dfdd99117754bbf1c7ea01b9b5190221d"
+                "reference": "a500bb301f19c93ba22670b650f98c797645ef50"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RebelCode/booking-system-interface/zipball/475bb56dfdd99117754bbf1c7ea01b9b5190221d",
-                "reference": "475bb56dfdd99117754bbf1c7ea01b9b5190221d",
+                "url": "https://api.github.com/repos/RebelCode/booking-system-interface/zipball/a500bb301f19c93ba22670b650f98c797645ef50",
+                "reference": "a500bb301f19c93ba22670b650f98c797645ef50",
                 "shasum": ""
             },
             "require": {
@@ -2104,7 +2104,7 @@
                 }
             ],
             "description": "Interfaces for the RebelCode PHP booking system library.",
-            "time": "2018-11-26T09:00:24+00:00"
+            "time": "2018-12-05T10:07:49+00:00"
         },
         {
             "name": "rebelcode/modular",
@@ -3909,16 +3909,16 @@
         },
         {
             "name": "rebelcode/rcmod-eddbk-cart",
-            "version": "dev-task/use-new-booking-system",
+            "version": "v0.1-alpha10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/RebelCode/rcmod-eddbk-cart.git",
-                "reference": "68e98b95c640dd8c8ccf2823a4be4684b6eaa8fd"
+                "reference": "84b1d5b2fa1af61f544f28febaae5ebc17c6851e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RebelCode/rcmod-eddbk-cart/zipball/68e98b95c640dd8c8ccf2823a4be4684b6eaa8fd",
-                "reference": "68e98b95c640dd8c8ccf2823a4be4684b6eaa8fd",
+                "url": "https://api.github.com/repos/RebelCode/rcmod-eddbk-cart/zipball/84b1d5b2fa1af61f544f28febaae5ebc17c6851e",
+                "reference": "84b1d5b2fa1af61f544f28febaae5ebc17c6851e",
                 "shasum": ""
             },
             "require": {
@@ -3937,12 +3937,12 @@
                 "johnpbloch/wordpress-core": "^4.0",
                 "phpunit/phpunit": "^4.8",
                 "ptrofimov/xpmock": "^1.1",
-                "rebelcode/booking-system-interface": "dev-develop as 0.1-alpha1",
+                "rebelcode/booking-system-interface": "^0.1-alpha1",
                 "rebelcode/entity-manager-interface": "^0.1-alpha1",
-                "rebelcode/rcmod-booking-logic": "0.1-alpha2",
-                "rebelcode/rcmod-eddbk-booking-logic": "0.1-alpha7",
-                "rebelcode/rcmod-eddbk-services": "0.1-alpha12",
-                "rebelcode/rcmod-wp-bookings-cqrs": "0.1-alpha8"
+                "rebelcode/rcmod-booking-logic": "^0.1-alpha3",
+                "rebelcode/rcmod-eddbk-booking-logic": "^0.1-alpha8",
+                "rebelcode/rcmod-eddbk-services": "^0.1-alpha13",
+                "rebelcode/rcmod-wp-bookings-cqrs": "^0.1-alpha8"
             },
             "type": "rc-module",
             "autoload": {
@@ -3961,7 +3961,7 @@
                 }
             ],
             "description": "A RebelCode module that adds EDD cart bookings functionality to EDD Bookings.",
-            "time": "2018-12-03T09:00:33+00:00"
+            "time": "2018-12-05T12:12:07+00:00"
         },
         {
             "name": "satooshi/php-coveralls",
@@ -5140,9 +5140,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "rebelcode/rcmod-eddbk-cart": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
